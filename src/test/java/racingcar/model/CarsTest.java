@@ -44,22 +44,20 @@ class CarsTest {
     @DisplayName("Cars는 입력된 순서대로 자동차를 반복한다")
     void shouldMaintainInsertionOrder_whenIterating() {
         // given
-        Car car1 = Car.named("pobi");
-        Car car2 = Car.named("woni");
-        Car car3 = Car.named("jun");
-        List<Car> carList = Arrays.asList(car1, car2, car3);
+        List<Car> carList = Arrays.asList(
+                Car.named("pobi"),
+                Car.named("woni"),
+                Car.named("jun")
+        );
         Cars cars = new Cars(carList);
 
         // when
-        List<Car> result = new ArrayList<>();
+        List<String> names = new ArrayList<>();
         for (Car car : cars) {
-            result.add(car);
+            names.add(car.getName());
         }
 
         // then
-        assertThat(result).hasSize(3);
-        assertThat(result.get(0)).isSameAs(car1);
-        assertThat(result.get(1)).isSameAs(car2);
-        assertThat(result.get(2)).isSameAs(car3);
+        assertThat(names).containsExactly("pobi", "woni", "jun");
     }
 }
