@@ -6,7 +6,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 class CarTest {
@@ -22,6 +21,7 @@ class CarTest {
 
         // then
         assertThat(car).isNotNull();
+        assertThat(car.getName()).isEqualTo(validName);
     }
 
     @Test
@@ -35,12 +35,22 @@ class CarTest {
 
         // then
         assertThat(car).isNotNull();
+        assertThat(car.getName()).isEqualTo(fiveCharName);
+    }
+
+    @Test
+    @DisplayName("null로 자동차를 생성하면 예외가 발생한다")
+    void shouldThrowException_whenNameIsNull() {
+        // when & then
+        assertThatThrownBy(() -> Car.named(null))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("자동차 이름은 null일 수 없습니다.");
     }
 
     @ParameterizedTest
-    @NullAndEmptySource
-    @DisplayName("null이나 빈 문자열로 자동차를 생성하면 예외가 발생한다")
-    void shouldThrowException_whenNameIsNullOrEmpty(String invalidName) {
+    @ValueSource(strings = {" ", "   ", "              "})
+    @DisplayName("공백 문자열로 자동차를 생성하면 예외가 발생한다")
+    void shouldThrowException_whenNameHasOnlySpace(String invalidName) {
         // when & then
         assertThatThrownBy(() -> Car.named(invalidName))
                 .isInstanceOf(IllegalArgumentException.class)
@@ -66,6 +76,7 @@ class CarTest {
 
         // then
         assertThat(car).isNotNull();
+        assertThat(car.getName()).isEqualTo(validName);
     }
 
     @Test
@@ -91,6 +102,7 @@ class CarTest {
 
         // then
         assertThat(car).isNotNull();
+        assertThat(car.getName()).isEqualTo(koreanName);
     }
 
     @Test
@@ -104,5 +116,72 @@ class CarTest {
 
         // then
         assertThat(car).isNotNull();
+        assertThat(car.getName()).isEqualTo(numericName);
+    }
+
+    @Test
+    @DisplayName("getName은 생성 시 입력한 이름을 반환한다")
+    void shouldReturnGivenName_whenGetNameIsCalled() {
+        // given
+        String expectedName = "pobi";
+        Car car = Car.named(expectedName);
+
+        // when
+        String actualName = car.getName();
+
+        // then
+        assertThat(actualName).isEqualTo(expectedName);
+    }
+
+    @Test
+    @DisplayName("앞뒤 공백이 제거된 이름을 반환한다")
+    void shouldReturnTrimmedName_whenNameHasWhitespace() {
+        // given
+        Car car = Car.named(" pobi ");
+
+        // when
+        String name = car.getName();
+
+        // then
+        assertThat(name).isEqualTo("pobi");
+    }
+
+    @Test
+    @DisplayName("초기 position은 0이다")
+    void shouldHaveInitialPositionZero_whenCarIsCreated() {
+        // given & when
+        Car car = Car.named("pobi");
+
+        // then
+        assertThat(car.getPosition()).isEqualTo(0);
+    }
+
+    @Test
+    @DisplayName("move 메서드 호출 시 position이 1 증가한다")
+    void shouldIncreasePositionByOne_whenMoveIsCalled() {
+        // given
+        Car car = Car.named("pobi");
+        int initialPosition = car.getPosition();
+
+        // when
+        car.move();
+
+        // then
+        assertThat(car.getPosition()).isEqualTo(initialPosition + 1);
+    }
+
+    @Test
+    @DisplayName("move 메서드를 여러 번 호출하면 position이 누적된다")
+    void shouldAccumulatePosition_whenMoveIsCalledMultipleTimes() {
+        // given
+        Car car = Car.named("pobi");
+
+        // when
+        car.move();
+        car.move();
+        car.move();
+
+        // then
+        assertThat(car.getPosition()).isEqualTo(3);
     }
 }

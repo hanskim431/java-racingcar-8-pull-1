@@ -3,10 +3,8 @@ package racingcar.model;
 public class Car {
     private final static int NAME_LENGTH_LIMITS = 5;
 
-    private String name;
+    private final String name;
     private int position;
-
-    private Car() {}
 
     private Car(String name) {
         this.name = name;
@@ -14,8 +12,17 @@ public class Car {
     }
 
     public static Car named(String name) {
-        validateName(name);
-        return new Car(name);
+        validateNameNotNull(name);
+        String trimmedName = name.trim();
+        validateName(trimmedName);
+        return new Car(trimmedName);
+    }
+
+    private static void validateNameNotNull(String name) {
+        final String ERROR_NULL_NAME = "자동차 이름은 null일 수 없습니다.";
+        if (name == null) {
+            throw new IllegalArgumentException(ERROR_NULL_NAME);
+        }
     }
 
     private static void validateName(String name) {
@@ -24,14 +31,28 @@ public class Car {
     }
 
     private static void validateNameNotEmpty(String name) {
-        if (name == null || name.isEmpty()) {
-            throw new IllegalArgumentException("자동차 이름은 비어있을 수 없습니다.");
+        final String ERROR_EMPTY_NAME = "자동차 이름은 비어있을 수 없습니다.";
+        if (name.isEmpty()) {
+            throw new IllegalArgumentException(ERROR_EMPTY_NAME);
         }
     }
 
     private static void validateNameLength(String name) {
+        final String ERROR_NAME_LENGTH = "자동차 이름은 5자 이하여야 합니다.";
         if (name.length() > NAME_LENGTH_LIMITS) {
-            throw new IllegalArgumentException("자동차 이름은 5자 이하여야 합니다.");
+            throw new IllegalArgumentException(ERROR_NAME_LENGTH);
         }
+    }
+
+    public void move() {
+        position++;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public int getPosition() {
+        return position;
     }
 }
